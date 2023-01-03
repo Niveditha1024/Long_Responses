@@ -1,0 +1,51 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+wine_dataset = pd.read_csv('C:/Users/CSE WPT/Desktop/winequality-red.csv')
+
+wine_dataset.shape
+
+wine_dataset.head()
+
+wine_dataset.isnull().sum()
+
+wine_dataset.describe()
+
+sns.catplot(x = 'quality', data = wine_dataset, kind = 'count')
+
+plot = plt.figure(figsize=(5,5))
+sns.barplot(x='quality', y = 'volatile acidity', data = wine_dataset)
+plt.show()
+
+plot = plt.figure(figsize=(5,5))
+sns.barplot(x='quality', y='citric acid', data = wine_dataset)
+plt.show()
+
+correlation = wine_dataset.corr()
+correlation
+
+plt.figure(figsize=(10,10))
+sns.heatmap(correlation, cbar=True, square=True, fmt = '.1f', annot=True, annot_kws={'size':8}, cmap = 'Blues')
+plt.show()
+
+x = wine_dataset.drop('quality', axis=1)
+print(x)
+
+Y = wine_dataset['quality'].apply(lambda y_value: 1 if y_value>=7 else 0)
+print(Y)
+
+X = wine_dataset['quality'].apply(lambda x_value: 1 if x_value>=10 else 0)
+print(X)
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=3)
+print(Y.shape, Y_train.shape, Y_test.shape)
+
+model = RandomForestClassifier()
+
+model.fit(X_train, Y_train)
+
