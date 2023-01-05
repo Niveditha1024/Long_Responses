@@ -1,0 +1,80 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
+from keras.models import Sequential
+from keras.layers import Dense
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import precision_score
+from sklearn.metrics import accuracy_score
+
+df = pd.read_csv('C:/Users/CSE WPT/Desktop/WineQT.csv')
+df
+
+df.head()
+
+df.tail()
+
+df.describe()
+
+df.shape
+
+df.info()
+
+df.isnull().sum()
+
+sns.pairplot(df,hue='quality',vars=['fixed acidity','volatile acidity','citric acid'])
+plt.show()                           
+
+sns.countplot(df['quality'],label='count')
+plt.show()
+
+df = df.fillna(df.mean())
+
+X = df.iloc[:, :-1].values
+y = df.iloc[:, -1].values
+
+print(X)
+
+print(y)
+
+plt.figure(figsize=(30,20))
+sns.heatmap(df.corr(),annot=True)
+plt.show()
+
+scaler = MinMaxScaler()
+X = scaler.fit_transform(X)
+print(scaler)
+print(X)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2)
+
+model = Sequential()
+model.add(Dense(units=128, activation='relu', input_dim=X_train.shape[1]))
+model.add(Dense(units=1, activation='linear'))
+
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['accuracy'])
+
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_val, y_val))
+
+plt.figure(figsize=(10,7))
+plt.title("WineQuality")
+plt.xlabel('Fixed Acidity')
+plt.ylabel('Volatile Acidity')
+plt.scatter(df['fixed acidity'],df['volatile acidity'],color='red',alpha=0.4)
+plt.show()
+
+plt.hist(df['fixed acidity'],color='blue',alpha=0.5)
+plt.show()
+
+test_accuracy = model.evaluate(X_test, y_test)
+print('Test accuracy:',test_accuracy)
+
+new_wines = np.array([[7.8,0.58,0.02,2,0.073,9,18,0.9968,3.36,0.57,9.5,7]])
+new_wines = scaler.transform(new_wines)
+predictions = model.predict(new_wines)
+print('Predicted quality:', predictions[0])
+
